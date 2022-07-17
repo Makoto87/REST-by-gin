@@ -43,6 +43,26 @@ func postAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
+// getAlbumByID locates the album whose ID value matches the id
+// parameter sent by the client, then returns that album as a response.
+func getAlbumByID(c *gin.Context) {
+	// id パラメータを取得
+	id := c.Param("id")
+
+	// Loop over the list of albums, looking for
+	// an album whose ID value matches the parameter.
+	// IDとマッチするalbumを探し、あったらJSONとして返す
+	for _, a := range albums {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+
+	// IDとマッチするalbumがなかったら404エラーを返す
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+}
+
 func main() {
 	// router の初期化
 	router := gin.Default()
@@ -50,6 +70,7 @@ func main() {
 	// ginはHTTPメソッドとパスをハンドラーと紐づけることが可能
 	// GETメソッドと /albums パス、getAlbums 関数を関連づける
 	router.GET("/albums", getAlbums)
+	router.GET("/albums/:id", getAlbumByID)
 	// POSTメソッドと /albums パス、postAlbums 関数を関連づける
 	router.POST("/albums", postAlbums)
 
