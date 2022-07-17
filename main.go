@@ -28,11 +28,30 @@ func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
+// postAlbums adds an album from JSON received in the request body.
+func postAlbums(c *gin.Context) {
+	var newAlbum album
+
+	// Call BindJSON to bind the received JSON to newAlbum.
+	// リクエストボディを newAlbum に紐づける
+	if err := c.BindJSON(&newAlbum); err != nil {
+		return
+	}
+
+	// Add the new album to the slice.
+	albums = append(albums, newAlbum)
+	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
 func main() {
 	// router の初期化
 	router := gin.Default()
-	// GETメソッドと、/albums パスを関連づける
+
+	// ginはHTTPメソッドとパスをハンドラーと紐づけることが可能
+	// GETメソッドと /albums パス、getAlbums 関数を関連づける
 	router.GET("/albums", getAlbums)
+	// POSTメソッドと /albums パス、postAlbums 関数を関連づける
+	router.POST("/albums", postAlbums)
 
 	// routerとhttpサーバーを紐付け、サーバーを立ち上げる
 	router.Run("localhost:8080")
